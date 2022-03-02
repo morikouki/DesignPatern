@@ -6,6 +6,7 @@
 // PrintBannerクラスの実装を変えられるということでもある
 public class Main {
 	public static void main(String[] args) {
+
 		Print p = new PrintBanner("Hello");
 		p.printWeak();
 		p.printStrong();

@@ -73,3 +73,30 @@ Adapterパターンを既存のクラスを修正しないで使用できるよ�
 Adapterパターンは使用できない。
 交流100ボルトの電源を元にして水道の水を出すわけにはいかない。
 
+練習問題
+java.util.Propertiesクラスは、
+ year=2004
+ month=4
+ day=21
+のような、キーとその値の組（プロパティ）を管理するためのもので、
+java.util.Propertiesクラスには、プロパティをストリームから読んだ李ストリームに書いたりするために、
+次のメソッドが用意されている
+ void load(InputStream in) throws IOException
+ 	プロパティの集合をInputStreamから読み込み
+ void store(OutputStream out, String header) throws IOException
+ 　　プロパティの集合をOutputStreamに書き込む。headerはコメント文字列
+
+Adapterパターンを使って、プロパティの集合をファイルに保存するFilePropertiesクラスを作ってください
+ここで、プロパティの集合をファイルに保存するメソッドはFileIOインタフェース（Target役）で宣言するものとする
+FilePropertiesクラスはこのFileIOインタフェースを実装するようにする
+実行前のfile.txtおよび実行後のnewfile.txtはそれぞれ下記のようになります
+【file.txt】
+yera=1999
+
+【newfile.txt】例
+#written by FileProperties
+#Web Apr 21 18:21:00 JST 2004
+day=21
+year=2004
+month=4
+

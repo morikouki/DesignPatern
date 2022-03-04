@@ -9,6 +9,7 @@ import factory.Tray;
 // 具体的な工場
 public class ListFactory extends Factory {
 
+	// Javaではコンストラクタは継承されないので定義しないといけない
 	public Link createLink(String caption, String url) {
 		return new ListLink(caption, url);
 	}

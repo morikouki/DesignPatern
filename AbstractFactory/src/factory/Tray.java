@@ -11,6 +11,7 @@ import java.util.ArrayList;
 // なので、Trayクラスも抽象クラスになる
 public abstract class Tray extends Item {
 
+	// privateにしてアクセス用のメソッドを実装しても良い
 	protected ArrayList tray = new ArrayList();
 
 	public Tray(String caption) {

@@ -1,0 +1,114 @@
+Interpreterパターン
+
+【文法規則をクラスで表現する】
+
+デザインパターンの目的の1つは、クラスの再利用性を高めること。
+再利用性とは、一度作成したクラスをあまり修正せずに何度も使えるようにすること
+
+Interpreterパターンでは、プログラムが解決しようとしている問題を簡単な「ミニ言語」で表現する。
+具体的な問題を、ミニ言語で書かれた「ミニ・プログラム」で表現する。
+ミニ・プログラムは、それだけでは動かないので、Java言語で「通訳」の役目を果たすプログラムを作っておく。
+通訳プログラムは、ミニ言語を理解し、ミニ・プログラムを解釈、実行する。
+この通訳プログラムのことをインタプリンタと呼ぶこともある。（インタプリンタ言語）
+解決すべき問題が変化したときには、Java言語で書かれたプログラムを書き換えるのではなく、ミニ・プログラムの方を書き換えることで対処する。
+
+サンプルプログラムで使用するミニ言語
+ラジコンで車を動かすための言語を考える。
+できることは以下の3つ
+・前へ1メートル進め(go)
+・右を向け(right)
+・左を向け(left)
+この3つが車に対して発行できる命令（コマンド）になる。
+goは1メートル進んで止まる命令で、rightはその場で右を向く命令、leftはその場で左を向く命令。
+実際の車では、位置を全くずらさずに右や左を向くというのは不可能だが、ここではターンテーブルを回すように向きを変えられるとしている。
+それに加え、
+・繰り返せ(repeat)
+という命令も加える。
+
+サンプルプログラムのインタプリンタが解釈するミニ言語の文法
+<program> ::= program <command list>
+<command list> ::= <command>* end
+<command> ::= <repeat command> | <primitive command>
+<repeat command> ::= repeat <number> <command list>
+<primitive command> ::= go | right | left
+
+解説
+プログラムを定義している。
+「<program>とは、programという単語の後にコマンドの例<command list>が続いたもの」と定義している
+::=の左辺が定義されるもの、右辺が定義の内容
+<program> ::= program <command list>
+
+コマンドの列<command list>を定義している。
+「<command list>とは、コマンド<command>が0個以上繰り返した後、endという単語がきたもの」と定義している。
+*は、直前のものの0回以上の繰り返しを表す。
+<command list> ::= <command>* end
+
+コマンド<command>を定義している。
+「<command>とは、繰り返しコマンド<repeat command>または基本コマンド<primitive command>のいずれか」と定義している。
+|は「または」を表す
+<command> ::= <repeat command> | <primitive command>
+
+繰り返しコマンド<repeat command>を定義している。
+「<repeat command>とは、repeatという単語の後に繰り返し回数<number>が続き、さらにコマンドの列<command list>が続いたもの」と定義している。
+コマンドの列<command list>は上で定義しているのでその中に<command>が使われ、<command>の定義の中に<repeat command>が使われ、
+<repeat command>の定義の中に<command list>が使われている。
+このように、あるものを定義している途中に、自分自身が登場してくる定義を、「再起的な定義」という。
+<repeat command> ::= repeat <number> <command list>
+
+基本コマンド<primitive command>を定義している。
+「<primitive command>とは、goまたは、rightまたはleft」と定義している。
+
+<number>は3や4や1234のような自然数を表すもの
+<primitive command> ::= go | right | left
+
+サンプルプログラムは、先ほどのミニ言語を構文解析するもの
+上記で説明した、ミニ・プログラムの各部分を分解して説明したように
+各部分がどのような構造になっているかを解析するのが、構文解析。
+例えば、
+ program repeat 4 go right end end
+ というミニ・プログラムが与えられたときに、構文木という構造をメモリ上に作り上げる処理が、構文解析。
+
+ Interpreterパターンの登場人物
+ ・AbstractEcpression（抽象的な表現）の役
+ 構文木のノードに共通のインタフェースを定める役
+ サンプルプログラムでは、Nodeクラスがこの役を務める。
+
+ ・TerminalExpression（終端となる表現）の役
+ BNFのターミナル・エクスプレッションに対応する役
+ サンプルプログラムでは、PrimitiveCommandNodeクラスがこの役を務める。
+
+ ・NoterminalExpression（非終端となる表現）の役
+ BNFのノンターミナル・エクスプレッションに対応する役
+ サンプルプログラムでは、ProgramNode, CommandNode, RepeatCommandNode, CommandListNodeの各クラスがこの役を務める。
+
+ ・Context（文脈、前後関係）の役
+ インタプリンタが構文解析を行うため情報を提供する役
+ サンプルプログラムでは、Contextクラスがこの役を務める。
+
+ ・Client（依頼者）の役
+ 構文木を組み立てるために、TerminalExpression役やNontermialExpression役を呼び出す役
+ サンプルプログラムでは、Mainクラスがこの役を務める。
+
+
+ 他のミニ言語
+ サンプルプログラムは、ラジコンで車の制御を行うミニ言語を考えたが、
+ 他にも色々ある。
+ ・正規表現
+ raining & (dogs | cats) *
+ のような表示を解釈し、構文木を作成する。
+ 上記は、rainingの後にdogsまたはcatsが0回以上繰り返すということを表現している
+
+ ・検索用の表現
+ 単語の組み合わせを表現するためにLittle Languageというパターンがある。
+ garlic and not onions
+ のような表記を解釈し、構文木を作成している。
+ 上記は、garlicを含むが、onionsを含まないということを表現している。
+
+ ・バッチ処理言語
+ 基本的な命令がいくつか用意されており、それらを順番に実行したり、繰り返し実行したりする言語（バッチ処理言語）も、
+ Interpreterパターンで処理できる。
+
+ 読み飛ばすか読み取るか
+ インタプリンタを作っているときによく起きるのが、トークンを1個多く読みすぎたり、
+ 読み残したりするバグ。各ノンターミナルに対応するメソッドを書くときは、常に「このメソッド二期ときにはどこまでトークンを読んでいるか、
+ このメソッドから出るときjにはどこまでトークンを読むべきか」を意識しておく必要がある。
